@@ -41,10 +41,10 @@ def sitemap():
 # -------------------------------------------------- PEOPLE --------------------------------------------------
 @app.route('/people', methods=['GET'])  #Listar todos los registros de people en la base de datos
 def get_all_people():
-    #hago un query all para retornar todas las columnas de la tabla people
+    
     people_query = People.query.all()
 
-    #hago un for in para luego retornarlo en formato json con jsonify
+    
     people_list = [{
         "id": people.id,
         "name": people.name,
@@ -66,7 +66,7 @@ def get_all_people():
 
 @app.route('/people/<int:people_id>', methods=['GET'])  #Listar la información de una sola people
 def get_people_by_id(people_id):
-    #hago un query.get para traer el id del personaje para luego devolverlo en formato json
+    
     people_query = People.query.get(people_id)
     if people_query:
         return jsonify({
@@ -81,7 +81,7 @@ def get_people_by_id(people_id):
             "birth_year": people_query.birth_year,
             "gender": people_query.gender,
         }), 200
-    # en caso de que el id de ese personaje no exista se retorna un mensaje de error 
+    
     else:
         return jsonify ({"msg": "Character not found"}), 404
 
@@ -91,10 +91,10 @@ def get_people_by_id(people_id):
     
 @app.route('/planets', methods=['GET'])  #Listar todos los registros de planets en la base de datos
 def get_all_planets():
-    #hago un query all para retornar todas las columnas de la tabla planets
+
     planets_query = Planets.query.all()
 
-    #hago un for in para luego retornarlo en formato json con jsonify
+    
     planets_list = [{
         "id": planets.id,
         "name": planets.name,
@@ -115,7 +115,7 @@ def get_all_planets():
 
 @app.route('/planets/<int:planets_id>', methods=['GET'])  #Listar la información de una sola planets
 def get_planets_by_id(planets_id):
-     #hago un query.get para traer el id del personaje para luego devolverlo en formato json
+     
     planets_query = Planets.query.get(planets_id)
     if planets_query:
         return jsonify({
@@ -130,7 +130,7 @@ def get_planets_by_id(planets_id):
             "terrain": planets_query.terrain,
             "surface_water": planets_query.surface_water
         }), 200
-    # en caso de que el id de ese planeta no exista se retorna un mensaje de error 
+    
     else:
         return jsonify ({"msg": "Planet not found"}), 404
 
@@ -156,10 +156,10 @@ def get_all_users():
 def get_all_favorites(user_id):
     user_query = User.query.filter_by(id = user_id).first()
 
-    #me aseguro de que el usuario exista en la base datos
+    
     if user_query:
 
-        #hago un blucle for accediendo a la tabla favorite planets mediante el foreinkey 
+         
         list_of_favorite_planets = [{
             'user_id' : fav.user_id,
             'username' : user_query.username,
@@ -168,7 +168,7 @@ def get_all_favorites(user_id):
 
         } for fav in user_query.favorite_planets]
 
-        #hago un blucle for accediendo a la tabla favorite people mediante el foreinkey
+        
         list_of_favorite_people = [{
             'user_id' : fav.user_id,
             'username' : user_query.username,
@@ -177,18 +177,18 @@ def get_all_favorites(user_id):
 
         } for fav in user_query.favorite_people] 
 
-        #en caso de que el usuario no tenga favoritos retorno el siguiente mensaje
+        
         if len(list_of_favorite_people) == 0 and len(list_of_favorite_planets) == 0:
             return jsonify({'msg': 'this user doesn`t have favorite planets nor characters'}), 400 
         
-        #retorno un objeto en formato json de forma ordenada
+        
         return jsonify( {
                          'planets_fav_list' : list_of_favorite_planets,
                          'people_fav_list' : list_of_favorite_people
                           }), 200
     
     else :
-        #en caso de que el usuario no exista 
+         
         return jsonify({'msg' : 'this user does not exist'}), 404
     
 
@@ -202,10 +202,10 @@ def add_favorite_planet(user_id, planet_id):
     planet_exists_db = Planets.query.get(planet_id)
     user_and_planet_exist_table = Favorite_Planets.query.filter_by(planet_fav_id= planet_id, user_id = user_id).first()
 
-    #me aseguro de que el usuario y el planeta existan en la base de datos para poder agregarlos
+    
     if user_exists_db and planet_exists_db:
             
-         #mientras el planeta no exista en la tabla de planetas favoritos        
+              
             if not user_and_planet_exist_table:
 
                 new_fav_planet = Favorite_Planets(user_id = user_exists_db.id, planet_fav_id = planet_exists_db.id)
@@ -233,10 +233,10 @@ def add_favorite_people(user_id, people_id):
     people_exists_db = People.query.get(people_id)
     user_and_people_exist_table = Favorite_People.query.filter_by(people_fav_id= people_id, user_id = user_id).first()
 
-    #me aseguro de que el usuario y el personaje existan en la base de datos para poder agregarlos
+    
     if user_exists_db and people_exists_db:
             
-         #mientras el personaje no exista en la tabla de personajes favoritos        
+                
             if not user_and_people_exist_table:
 
                 new_fav_people = Favorite_People(user_id = user_exists_db.id, people_fav_id = people_exists_db.id)
@@ -266,10 +266,10 @@ def delete_fav_planet_by_id(user_id, planet_id):
     planet_exists_db = Planets.query.get(planet_id)
     user_and_planet_exist_table = Favorite_Planets.query.filter_by(planet_fav_id= planet_id, user_id = user_id).first()
 
-    #me aseguro de que el usuario y el planeta existan en la base de datos para poder eliminarlos
+    
     if user_exists_db and planet_exists_db:
             
-         #mientras el planeta exista en la tabla de planetas favoritos        
+                
             if user_and_planet_exist_table:
 
                 db.session.delete(user_and_planet_exist_table)
@@ -294,10 +294,10 @@ def delete_fav_people_by_id(user_id, people_id):
     people_exists_db = People.query.get(people_id)
     user_and_people_exist_table = Favorite_People.query.filter_by(people_fav_id= people_id, user_id = user_id).first()
 
-    #me aseguro de que el usuario y el personaje existan en la base de datos para poder eliminarlos
+    
     if user_exists_db and people_exists_db:
             
-         #mientras el personaje exista en la tabla de personajes favoritos        
+                 
             if user_and_people_exist_table:
 
                 db.session.delete(user_and_people_exist_table)
